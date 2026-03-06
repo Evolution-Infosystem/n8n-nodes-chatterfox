@@ -1,4 +1,4 @@
-import type { ICredentialType, INodeProperties } from 'n8n-workflow';
+import type { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
 
 export class ChatterfoxApi implements ICredentialType {
 	name = 'chatterfoxApi';
@@ -23,4 +23,14 @@ export class ChatterfoxApi implements ICredentialType {
 			description: 'Your Chatterfox API key (create one in Chatterfox dashboard)',
 		},
 	];
+	test: ICredentialTestRequest = {
+		request: {
+			baseURL: '={{$credentials.baseUrl}}',
+			url: '/api/v1/whatsapp/accounts',
+			method: 'POST',
+			body: {
+				apiKey: '={{$credentials.apiKey}}',
+			},
+		},
+	};
 }
