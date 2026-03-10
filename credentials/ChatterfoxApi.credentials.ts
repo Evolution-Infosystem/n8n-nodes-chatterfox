@@ -4,13 +4,13 @@ export class ChatterfoxApi implements ICredentialType {
 	name = 'chatterfoxApi';
 	icon = 'file:../../assets/chatterfox-icon.svg' as const;
 	displayName = 'Chatterfox API';
-	documentationUrl = 'https://docs.chatterfox.co';
+	documentationUrl = 'https://api.chatterfox.co/platform/api/docs#';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Base URL',
 			name: 'baseUrl',
 			type: 'string',
-			default: 'https://staging-be.chatterfox.co',
+			default: 'https://api.chatterfox.co/',
 			placeholder: 'https://api.chatterfox.co/',
 			description: 'Chatterfox API base URL (default: staging; use https://api.chatterfox.co for production)',
 		},

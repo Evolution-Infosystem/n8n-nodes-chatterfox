@@ -1,5 +1,5 @@
 {
-  "name": "@evolution_infosystem/n8n-nodes-chatterfox",
+  "name": "@evolution-infosystem/n8n-nodes-chatterfox",
   "version": "0.1.4",
   "description": "n8n node to send WhatsApp messages via Chatterfox",
   "license": "MIT",

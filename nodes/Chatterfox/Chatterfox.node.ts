@@ -9,7 +9,7 @@ import {
 	NodeOperationError,
 } from 'n8n-workflow';
 
-const DEFAULT_BASE_URL = 'https://staging-be.chatterfox.co';
+const DEFAULT_BASE_URL = 'https://api.chatterfox.co/';
 
 export class Chatterfox implements INodeType {
 	description: INodeTypeDescription = {

@@ -63,17 +63,17 @@ A `.env` file is **not required**. The node gets the API base URL from the n8n c
 2. Set `CHATTERFOX_API_BASE_URL` (or re-use `NEXT_PUBLIC_BACKEND_URL` if n8n runs with the same env as your frontend):
 
    ```env
-   CHATTERFOX_API_BASE_URL=https://staging-be.chatterfox.co
+   CHATTERFOX_API_BASE_URL=https://api.chatterfox.co/
    ```
 
-3. When the credential’s **Base URL** is empty, the node will use this env value. Staging default: `https://staging-be.chatterfox.co`; production: `https://api.chatterfox.co`.
+3. When the credential’s **Base URL** is empty, the node will use this env value. Staging default: `https://api.chatterfox.co/`; production: `https://api.chatterfox.co`.
 
 ### Credentials
 
 1. Create a new Chatterfox credential in n8n
 2. Enter your **API Key** (from Chatterfox dashboard > API Keys)
 3. Enter your **Account ID** (WhatsApp account ID from Chatterfox)
-4. (Optional) **Base URL** - default is staging `https://staging-be.chatterfox.co`. Leave empty to use `CHATTERFOX_API_BASE_URL` or `NEXT_PUBLIC_BACKEND_URL` from `.env` if set.
+4. (Optional) **Base URL** - default is staging `https://api.chatterfox.co/`. Leave empty to use `CHATTERFOX_API_BASE_URL` or `NEXT_PUBLIC_BACKEND_URL` from `.env` if set.
 
 ### Send Message
 
@@ -89,7 +89,7 @@ The node calls the Chatterfox API:
 - `POST {baseUrl}/api/v1/send-message`
 - Body: `{ apiKey, accountId, to, message }`
 
-Base URL defaults to staging (`https://staging-be.chatterfox.co`); override in the credential or via `CHATTERFOX_API_BASE_URL` in `.env`.
+Base URL defaults to staging (`https://api.chatterfox.co/`); override in the credential or via `CHATTERFOX_API_BASE_URL` in `.env`.
 
 ## Development
 
