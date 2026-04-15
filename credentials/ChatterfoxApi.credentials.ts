@@ -1,10 +1,24 @@
-import type { ICredentialTestRequest, ICredentialType, INodeProperties } from 'n8n-workflow';
+import type {
+	IAuthenticateGeneric,
+	ICredentialTestRequest,
+	ICredentialType,
+	INodeProperties,
+} from 'n8n-workflow';
 
 export class ChatterfoxApi implements ICredentialType {
 	name = 'chatterfoxApi';
-	icon = 'file:../../assets/chatterfox-icon.svg' as const;
+	icon = 'file:../assets/chatterfox-icon.svg' as const;
 	displayName = 'Chatterfox API';
 	documentationUrl = 'https://api.chatterfox.co/platform/api/docs#';
+	authenticate: IAuthenticateGeneric = {
+		type: 'generic',
+		properties: {
+			headers: {
+				'x-api-key': '={{$credentials.apiKey}}',
+				Authorization: '=Bearer {{$credentials.apiKey}}',
+			},
+		},
+	};
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Base URL',

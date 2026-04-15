@@ -1,0 +1,33 @@
+# Publishes to npm with provenance (required for n8n community node verification from May 1, 2026).
+# Configure repository secret NPM_TOKEN with an automation token from https://www.npmjs.com/
+# or use npm trusted publishing (OIDC) per npm docs.
+
+name: Publish to npm
+
+on:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

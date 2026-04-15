@@ -5,6 +5,8 @@ import {
 	type INodeExecutionData,
 	type INodeType,
 	type INodeTypeDescription,
+	type JsonObject,
+	NodeApiError,
 	NodeConnectionTypes,
 	NodeOperationError,
 } from 'n8n-workflow';
@@ -30,7 +32,6 @@ export class Chatterfox implements INodeType {
 			{
 				name: 'chatterfoxApi',
 				required: true,
-				testedBy: 'getAccounts',
 			},
 		],
 		properties: [
@@ -88,7 +89,7 @@ export class Chatterfox implements INodeType {
 				type: 'string',
 				default: '',
 				placeholder: '1234567890',
-				description: "Recipient's phone number without country code (e.g. 8141943231). Combined with Country Code to form the full number.",
+				description: "Recipient's phone number without country code (e.g. 1234567890). Combined with Country Code to form the full number.",
 				displayOptions: {
 					show: {
 						operation: ['sendMessage'],
@@ -234,19 +235,20 @@ export class Chatterfox implements INodeType {
 					const apiKey = creds.apiKey as string;
 					const base =
 						(creds.baseUrl as string)?.trim()?.replace(/\/$/, '') || DEFAULT_BASE_URL.replace(/\/$/, '');
-					const res = await this.helpers.httpRequest({
+					const res = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 						method: 'POST',
 						url: `${base}/api/v1/whatsapp/accounts`,
 						headers: {
 							'Content-Type': 'application/json',
 						},
-						body: JSON.stringify({
-							apiKey: apiKey,
+						body: {
+							apiKey,
 							page: 1,
 							limit: 100,
 							search: '',
 							activeOnly: false,
-						}),
+						},
+						json: true,
 					});
 					const data = (res as { data?: { id: string; name: string; phoneNumber: string; status: string }[] }).data || [];
 					return data.map((a) => ({ name: `${a.name} (${a.phoneNumber})${a.status === 'connected' ? ' - Active' : ' - Inactive'}`, value: a.id }));
@@ -259,7 +261,7 @@ export class Chatterfox implements INodeType {
 					const creds = await this.getCredentials('chatterfoxApi');
 					const base =
 						(creds.baseUrl as string)?.trim()?.replace(/\/$/, '') || DEFAULT_BASE_URL.replace(/\/$/, '');
-					const res = await this.helpers.httpRequest({
+					const res = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 						method: 'GET',
 						url: `${base}/timezones`,
 						json: true,
@@ -275,7 +277,7 @@ export class Chatterfox implements INodeType {
 					const creds = await this.getCredentials('chatterfoxApi');
 					const base =
 						(creds.baseUrl as string)?.trim()?.replace(/\/$/, '') || DEFAULT_BASE_URL.replace(/\/$/, '');
-					const res = await this.helpers.httpRequest({
+					const res = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 						method: 'GET',
 						url: `${base}/countries`,
 						json: true,
@@ -309,7 +311,6 @@ export class Chatterfox implements INodeType {
 					const to = (countryCode.trim() + phoneNumber.replace(/^\s*\+/, '').trim()).trim();
 					const message = this.getNodeParameter('message', i) as string;
 					const fileMode = this.getNodeParameter('fileMode', i, 'none') as string;
-					// const scheduledTime = this.getNodeParameter('scheduledTime', i, '') as string;
 					const scheduledTimeRaw = this.getNodeParameter('scheduledTime', i, '') as string | number;
 					const scheduledTime =
 						typeof scheduledTimeRaw === 'number'
@@ -338,16 +339,9 @@ export class Chatterfox implements INodeType {
 						} else {
 							binaryPropNames = Object.keys(items[i].binary || {});
 						}
-						// const binaryPropNames = binaryPropsRaw.split(',').map((p) => p.trim()).filter(Boolean);
 						if (binaryPropNames.length === 0) {
 							throw new NodeOperationError(this.getNode(), 'No binary files found to attach', { itemIndex: i });
 						}
-						// const binaryPropertyName = this.getNodeParameter('binaryProperties', i, '') as string;
-						// console.log('Available binary properties:', Object.keys(items[i].binary || {}));
-						// const binaryData = this.helpers.assertBinaryData(i, binaryPropertyName);
-						// const buffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
-						// const blob = new Blob([buffer], { type: binaryData.mimeType });
-						// Use n8n's helper to construct the multipart body correctly
 						const formData = new FormData();
 						formData.append('apiKey', apiKey);
 						formData.append('accountId', accountId);
@@ -361,31 +355,27 @@ export class Chatterfox implements INodeType {
 						if (!items[i].binary || Object.keys(items[i].binary || {}).length === 0) {
 							continue; // skip this item entirely
 						}
-  
+
 						for (const propName of binaryPropNames) {
 							try {
-							  const binaryData = this.helpers.assertBinaryData(i, propName);
-							  const buffer = await this.helpers.getBinaryDataBuffer(i, propName);
-						
-							  // Important: use correct filename & mime type
-							  formData.append(
-								'files',                            // ← field name your API expects
-								new Blob([buffer], { type: binaryData.mimeType }),
-								binaryData.fileName || `file-${propName}`
-							  );
-							} catch {
-								// Skip missing binary property
+								const binaryData = this.helpers.assertBinaryData(i, propName);
+								const buffer = await this.helpers.getBinaryDataBuffer(i, propName);
+
+								formData.append(
+									'files',
+									new Blob([buffer], { type: binaryData.mimeType }),
+									binaryData.fileName || `file-${propName}`,
+								);
+							} catch (error) {
+								const detail = error instanceof Error ? error.message : String(error);
+								this.logger.warn(
+									`Chatterfox: skipped binary property "${propName}" on item ${i}: ${detail}`,
+								);
 							}
 						}
-						const response = await this.helpers.httpRequest({
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 							method: 'POST',
 							url: `${baseUrl}/api/v1/send-message`,
-							headers: {
-								'x-api-key': apiKey,
-								// Authorization header if required by your API
-								'Authorization': `Bearer ${apiKey}`,
-
-							},
 							body: formData,
 						});
 					
@@ -413,15 +403,14 @@ export class Chatterfox implements INodeType {
 							if (fileList.length > 0) body.files = fileList;
 						}
 
-						// if (scheduledTime?.trim()) body.scheduledTime = scheduledTime.trim();
 						if (scheduledTime) body.scheduledTime = scheduledTime;
 						if (timezoneId?.trim()) body.timezoneId = timezoneId.trim();
 						if (expiration !== '' && expiration !== undefined && String(expiration).trim() !== '') body.expiration = Number(expiration);
 
-						const response = await this.helpers.httpRequest({
+						const response = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 							method: 'POST',
 							url: `${baseUrl}/api/v1/send-message`,
-							headers: { 'Content-Type': 'application/json', 'x-api-key': apiKey, Authorization: `Bearer ${apiKey}` },
+							headers: { 'Content-Type': 'application/json' },
 							body,
 							json: true,
 						});
@@ -435,33 +424,16 @@ export class Chatterfox implements INodeType {
 
 				} catch (error) {
 					if (this.continueOnFail()) {
-						returnData.push({ json: { success: false, error: error instanceof Error ? error.message : String(error) } as IDataObject, pairedItem: { item: i } });
+						returnData.push({
+							json: {
+								success: false,
+								error: error instanceof Error ? error.message : String(error),
+							} as IDataObject,
+							pairedItem: { item: i },
+						});
 					} else {
 						if (error instanceof NodeOperationError) throw error;
-						const err = error as { response?: { status?: number; data?: unknown }; message?: string };
-						const status = err.response?.status;
-						const data = err.response?.data;
-						let serverMessage: string;
-						const dataStr = typeof data === 'string' ? data : '';
-						const msgStr = err.message || '';
-						const isHtmlBlockPage =
-							(dataStr && (dataStr.trimStart().startsWith('<!DOCTYPE') || dataStr.trimStart().startsWith('<html') || dataStr.includes('Web Filter Violation') || dataStr.includes('FortiGuard') || dataStr.includes('Access Blocked'))) ||
-							(msgStr.includes('Web Filter Violation') || msgStr.includes('FortiGuard'));
-						if (isHtmlBlockPage) {
-							serverMessage = 'Your network blocked the request (e.g. FortiGuard / Proxy Avoidance). Try: (1) Set Base URL to https://api.chatterfox.co/ or https://api.chatterfox.co, or (2) Use another network.';
-						} else if (data && typeof data === 'object' && 'message' in data) {
-							serverMessage = (data as { message?: string }).message || err.message || 'Request failed';
-						} else if (data && typeof data === 'object' && 'error' in data) {
-							serverMessage = (data as { error?: string }).error || err.message || 'Request failed';
-						} else if (typeof data === 'string') {
-							serverMessage = data || err.message || 'Request failed';
-						} else if (data && typeof data === 'object') {
-							serverMessage = JSON.stringify(data);
-						} else {
-							serverMessage = err.message || 'Request failed';
-						}
-						const hint = status === 403 && !isHtmlBlockPage ? ' — Check: API Key and Account ID are correct, Base URL matches your Chatterfox backend, and the key has send permissions.' : '';
-						throw new NodeOperationError(this.getNode(), serverMessage + hint, { itemIndex: i });
+						throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 					}
 				}
 			}
