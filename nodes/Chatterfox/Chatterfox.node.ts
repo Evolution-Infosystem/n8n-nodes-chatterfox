@@ -252,7 +252,10 @@ export class Chatterfox implements INodeType {
 					});
 					const data = (res as { data?: { id: string; name: string; phoneNumber: string; status: string }[] }).data || [];
 					return data.map((a) => ({ name: `${a.name} (${a.phoneNumber})${a.status === 'connected' ? ' - Active' : ' - Inactive'}`, value: a.id }));
-				} catch {
+				} catch (error: unknown) {
+					this.logger.warn('Chatterfox: failed to load WhatsApp accounts for dropdown', {
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
 					return [];
 				}
 			},
@@ -268,7 +271,10 @@ export class Chatterfox implements INodeType {
 					});
 					const data = (res as { data?: { name: string; utc?: string; offset?: string }[] }).data || [];
 					return data.map((t) => ({ name: `${t.name} (${t.utc ?? t.offset ?? ''})`, value: t.name }));
-				} catch {
+				} catch (error: unknown) {
+					this.logger.warn('Chatterfox: failed to load timezones for dropdown', {
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
 					return [];
 				}
 			},
@@ -284,7 +290,10 @@ export class Chatterfox implements INodeType {
 					});
 					const data = (res as { data?: { name: string; dialCode: string }[] }).data || [];
 					return data.map((c) => ({ name: `${c.name} (${c.dialCode})`, value: c.dialCode }));
-				} catch {
+				} catch (error: unknown) {
+					this.logger.warn('Chatterfox: failed to load countries for dropdown', {
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
 					return [];
 				}
 			},

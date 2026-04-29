@@ -1,7 +1,16 @@
-# Publishes to npm with provenance (required for n8n community node verification from May 1, 2026).
-# Configure repository secret NPM_TOKEN with an automation token from https://www.npmjs.com/
-# or use npm trusted publishing (OIDC) per npm docs.
-
+# Publishes to npm with provenance (n8n verified community nodes; required from May 1, 2026).
+#
+# --- Recommended: npm Trusted Publishing (OIDC) ---
+# 1. npmjs.com → your package → Access / Publishing → Trusted Publisher → GitHub Actions
+# 2. Match exactly: org/user, repo name, workflow filename `publish.yml` (case-sensitive)
+# 3. No NPM_TOKEN secret needed; npm CLI uses short-lived OIDC on GitHub-hosted runners.
+# 4. Requires npm CLI >= 11.5.1 (see `Upgrade npm` step below).
+#
+# --- Alternative: classic automation token ---
+# If you cannot use Trusted Publishing yet, add repo secret NPM_TOKEN and uncomment
+# NODE_AUTH_TOKEN under the publish step.
+#
+# n8n-node blocks bare `npm publish` unless RELEASE_MODE is set (same as `npm run release`).
 name: Publish to npm
 
 on:
@@ -11,7 +20,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write
+  id-token: write # required for OIDC + provenance attestations on GitHub Actions
 
 jobs:
   publish:
@@ -24,10 +33,18 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
+      # Trusted Publishing (OIDC) needs npm >= 11.5.1; Node 20 ships with npm 10.x.
+      - name: Upgrade npm for OIDC / provenance
+        run: npm install -g npm@^11.5.1
+
       - run: npm ci
 
       - run: npm run build
 
-      - run: npm publish --provenance --access public
+      - name: Publish to npm
+        run: npm publish --provenance --access public
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          RELEASE_MODE: 'true'
+          # Trusted Publishing: omit NODE_AUTH_TOKEN so the CLI uses OIDC from GitHub.
+          # Token fallback: create secret NPM_TOKEN at Settings → Secrets → Actions, then uncomment:
+          # NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

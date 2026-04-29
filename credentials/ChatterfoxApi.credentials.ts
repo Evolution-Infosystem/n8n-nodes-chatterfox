@@ -26,7 +26,7 @@ export class ChatterfoxApi implements ICredentialType {
 			type: 'string',
 			default: 'https://api.chatterfox.co/',
 			placeholder: 'https://api.chatterfox.co/',
-			description: 'Chatterfox API base URL (default: staging; use https://api.chatterfox.co for production)',
+			description: 'Chatterfox API base URL (use https://api.chatterfox.co)',
 		},
 		{
 			displayName: 'API Key',
