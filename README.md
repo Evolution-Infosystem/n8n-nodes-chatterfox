@@ -55,7 +55,7 @@ Then enable it in n8n:
 
 Restart n8n if required, then search the node palette for **Chatterfox**.
 
-### Local development
+### Local development 
 
 ```bash
 git clone <repository-url>
