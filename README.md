@@ -6,6 +6,7 @@ n8n community node for [Chatterfox](https://chatterfox.co) — send WhatsApp mes
 
 ## Project structure
 
+
 ```
 n8n-nodes-chatterfox/
 ├── .github/
