@@ -74,7 +74,7 @@ npm run build:watch
 
 and point your n8n instance at the built output per n8n’s [custom nodes](https://docs.n8n.io/integrations/creating-nodes/) documentation.
 
-## Configuration
+## Configuration 
 
 ### Credentials (Chatterfox API)
 
