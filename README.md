@@ -4,7 +4,7 @@ n8n community node for [Chatterfox](https://chatterfox.co) — send WhatsApp mes
 
 **Published package name:** `@evolution-infosystem/n8n-nodes-chatterfox` (hyphens in the scope).
 
-## Project structure
+## Project structure 
 
 ```
 n8n-nodes-chatterfox/
