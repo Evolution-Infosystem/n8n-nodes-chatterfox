@@ -18,7 +18,7 @@
     "url": "git+https://github.com/Evolution-Infosystem/n8n-nodes-chatterfox.git"
   },
   "scripts": {
-    "build": "tsc && copyfiles \"assets/*\" dist/assets",
+    "build": "n8n-node build",
     "build:watch": "tsc --watch",
     "dev": "n8n-node dev",
     "lint": "n8n-node lint",
@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@n8n/node-cli": "*",
-    "copyfiles": "^2.4.1",
     "eslint": "9.32.0",
     "n8n-workflow": "*",
     "prettier": "3.6.2",

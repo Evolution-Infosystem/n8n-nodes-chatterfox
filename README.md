@@ -11,13 +11,13 @@ n8n-nodes-chatterfox/
 ├── .github/
 │   └── workflows/
 │       └── publish.yml           # npm publish with provenance (CI)
-├── assets/
-│   └── chatterfox-icon.svg      # Node/credential icon (copied to dist/assets on build)
 ├── credentials/
-│   └── ChatterfoxApi.credentials.ts   # API key, Base URL, auth headers, credential test
+│   ├── ChatterfoxApi.credentials.ts   # API key, Base URL, auth headers, credential test
+│   └── chatterfox-icon.svg            # Credential icon (co-located per n8n template)
 ├── nodes/
 │   └── Chatterfox/
-│       └── Chatterfox.node.ts   # Send Message operation, load options, HTTP calls
+│       ├── Chatterfox.node.ts   # Send Message operation, load options, HTTP calls
+│       └── chatterfox-icon.svg  # Node icon (co-located per n8n template)
 ├── package.json
 ├── README.md
 └── tsconfig.json
@@ -45,7 +45,7 @@ n8n-nodes-chatterfox/
 Install the published package:
 
 ```bash
-npm install @evolution_infosystem/n8n-nodes-chatterfox
+npm install @evolution-infosystem/n8n-nodes-chatterfox
 ```
 
 Then enable it in n8n:
@@ -133,12 +133,16 @@ Send message requests include your API key and account ID in the body (and multi
 
 Official API docs: [Chatterfox API documentation](https://api.chatterfox.co/platform/api/docs#).
 
+## Icons
+
+Node and credential icons are **not** stored in a shared `assets/` folder. Each icon sits next to the file that references it (`file:chatterfox-icon.svg`), which matches the [n8n community node template](https://docs.n8n.io/integrations/creating-nodes/build/n8n-node/). `npm run build` (`n8n-node build`) copies those SVGs into `dist/nodes/Chatterfox/` and `dist/credentials/` for npm publish.
+
 ## Development
 
 ```bash
 npm install
-npm run build        # Compile TypeScript + copy assets to dist/
-npm run build:watch  # Watch mode
+npm run build        # n8n-node build — compiles TS and copies co-located icons to dist/
+npm run build:watch  # TypeScript watch (re-run build after icon changes)
 npm run dev          # n8n with this node (dev)
 npm run lint         # Lint
 npm run lint:fix     # Lint with auto-fix
@@ -182,7 +186,7 @@ Verified community nodes should be published from **GitHub Actions** with **npm 
 
    The workflow runs `npm ci`, `npm run build`, upgrades npm for OIDC/provenance, then **`npm publish --provenance --access public`** with **`RELEASE_MODE`** set so `prepublishOnly` (`n8n-node prerelease`) succeeds in CI.
 
-4. **Verify** on npm that the new version appears and **provenance** is listed for that version.
+4. **Verify** on npm that the new version appears and **provenance** is listed for that version. Confirm the tarball includes `dist/nodes/Chatterfox/chatterfox-icon.svg` and `dist/credentials/chatterfox-icon.svg` (no root `assets/` folder).
 
 5. **Creator Portal** — Submit or resubmit that **same published version** for community verification if needed.
 

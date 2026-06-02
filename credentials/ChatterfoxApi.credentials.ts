@@ -1,5 +1,6 @@
 import type {
 	IAuthenticateGeneric,
+	Icon,
 	ICredentialTestRequest,
 	ICredentialType,
 	INodeProperties,
@@ -7,7 +8,10 @@ import type {
 
 export class ChatterfoxApi implements ICredentialType {
 	name = 'chatterfoxApi';
-	icon = 'file:../assets/chatterfox-icon.svg' as const;
+	icon: Icon = {
+		light: 'file:chatterfox-icon.svg',
+		dark: 'file:chatterfox-icon.svg',
+	}
 	displayName = 'Chatterfox API';
 	documentationUrl = 'https://api.chatterfox.co/platform/api/docs#';
 	authenticate: IAuthenticateGeneric = {

@@ -17,7 +17,7 @@ export class Chatterfox implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Chatterfox',
 		name: 'chatterfox',
-		icon: 'file:../../assets/chatterfox-icon.svg' as const,
+		icon: 'file:chatterfox-icon.svg',
 		group: ['transform'],
 		version: 1,
 		subtitle: '={{$parameter["operation"]}}',
