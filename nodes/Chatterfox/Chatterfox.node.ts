@@ -9,7 +9,7 @@ import {
 	NodeApiError,
 	NodeConnectionTypes,
 	NodeOperationError,
-} from 'n8n-workflow';
+} from 'n8n-workflow'; 
 
 const DEFAULT_BASE_URL = 'https://api.chatterfox.co/';
 
