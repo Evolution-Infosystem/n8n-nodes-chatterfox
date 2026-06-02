@@ -10,7 +10,7 @@ export class ChatterfoxApi implements ICredentialType {
 	name = 'chatterfoxApi';
 	icon: Icon = {
 		light: 'file:chatterfox-icon.svg',
-		dark: 'file:chatterfox-icon.svg',
+		dark: 'file:chatterfox-icon-dark.svg',
 	}
 	displayName = 'Chatterfox API';
 	documentationUrl = 'https://api.chatterfox.co/platform/api/docs#';
