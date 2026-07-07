@@ -170,7 +170,7 @@ Verified community nodes should be published from **GitHub Actions** with **npm 
 3. In `.github/workflows/publish.yml`, uncomment **`NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`** on the publish step.
 
 ### Local walkthrough (interactive `npm run release`)
-
+ 
 Before cutting a release, a typical local session looks like this:
 
 ```bash
