@@ -2,7 +2,7 @@
 
 n8n community node for [Chatterfox](https://chatterfox.co) — send WhatsApp messages from your n8n workflows.
 
-**Published package name:** `@evolution_infosystem/n8n-nodes-chatterfox` (hyphens in the scope).
+**Published package name:** `@evolution_infosystem/n8n-nodes-chatterfox` (underscore in the scope).
 
 ## Project structure
 
@@ -165,7 +165,7 @@ Verified community nodes should be published from **GitHub Actions** with **npm 
 
 **Alternative — automation token**
 
-1. Create an npm **granular** or **automation** token with publish rights for `@evolution-infosystem`.
+1. Create an npm **granular** or **automation** token with publish rights for `@evolution_infosystem`.
 2. Add it as GitHub repository secret **`NPM_TOKEN`**.
 3. In `.github/workflows/publish.yml`, uncomment **`NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`** on the publish step.
 
