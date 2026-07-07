@@ -25,14 +25,6 @@ export class ChatterfoxApi implements ICredentialType {
 	};
 	properties: INodeProperties[] = [
 		{
-			displayName: 'Base URL',
-			name: 'baseUrl',
-			type: 'string',
-			default: 'https://api.chatterfox.co/',
-			placeholder: 'https://api.chatterfox.co/',
-			description: 'Chatterfox API base URL (use https://api.chatterfox.co)',
-		},
-		{
 			displayName: 'API Key',
 			name: 'apiKey',
 			type: 'string',
@@ -43,7 +35,7 @@ export class ChatterfoxApi implements ICredentialType {
 	];
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: '={{$credentials.baseUrl}}',
+			baseURL: 'https://api.chatterfox.co',
 			url: '/api/v1/whatsapp/accounts',
 			method: 'POST',
 			body: {

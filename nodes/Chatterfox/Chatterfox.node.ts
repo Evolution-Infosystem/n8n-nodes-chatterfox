@@ -233,8 +233,7 @@ export class Chatterfox implements INodeType {
 				try {
 					const creds = await this.getCredentials('chatterfoxApi');
 					const apiKey = creds.apiKey as string;
-					const base =
-						(creds.baseUrl as string)?.trim()?.replace(/\/$/, '') || DEFAULT_BASE_URL.replace(/\/$/, '');
+					const base = DEFAULT_BASE_URL.replace(/\/$/, '');
 					const res = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 						method: 'POST',
 						url: `${base}/api/v1/whatsapp/accounts`,
@@ -261,9 +260,7 @@ export class Chatterfox implements INodeType {
 			},
 			async getTimezones(this: ILoadOptionsFunctions) {
 				try {
-					const creds = await this.getCredentials('chatterfoxApi');
-					const base =
-						(creds.baseUrl as string)?.trim()?.replace(/\/$/, '') || DEFAULT_BASE_URL.replace(/\/$/, '');
+					const base = DEFAULT_BASE_URL.replace(/\/$/, '');
 					const res = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 						method: 'GET',
 						url: `${base}/timezones`,
@@ -280,9 +277,7 @@ export class Chatterfox implements INodeType {
 			},
 			async getCountries(this: ILoadOptionsFunctions) {
 				try {
-					const creds = await this.getCredentials('chatterfoxApi');
-					const base =
-						(creds.baseUrl as string)?.trim()?.replace(/\/$/, '') || DEFAULT_BASE_URL.replace(/\/$/, '');
+					const base = DEFAULT_BASE_URL.replace(/\/$/, '');
 					const res = await this.helpers.httpRequestWithAuthentication.call(this, 'chatterfoxApi', {
 						method: 'GET',
 						url: `${base}/countries`,
@@ -308,9 +303,7 @@ export class Chatterfox implements INodeType {
 		const credentials = await this.getCredentials('chatterfoxApi');
 		const apiKey = credentials.apiKey as string;
 		const accountId = this.getNodeParameter('accountId', 0) as string;
-		let baseUrl =
-			(credentials.baseUrl as string)?.trim() || DEFAULT_BASE_URL.replace(/\/$/, '');
-		baseUrl = baseUrl.replace(/\/$/, '');
+		const baseUrl = DEFAULT_BASE_URL.replace(/\/$/, '');
 
 		if (operation === 'sendMessage') {
 			for (let i = 0; i < items.length; i++) {
@@ -440,8 +433,9 @@ export class Chatterfox implements INodeType {
 							} as IDataObject,
 							pairedItem: { item: i },
 						});
+					} else if (error instanceof NodeOperationError) {
+						throw new NodeOperationError(this.getNode(), error, { itemIndex: i });
 					} else {
-						if (error instanceof NodeOperationError) throw error;
 						throw new NodeApiError(this.getNode(), error as JsonObject, { itemIndex: i });
 					}
 				}
